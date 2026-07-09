@@ -1,0 +1,30 @@
+{
+  "name": "react-calendar-workspace",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Workspace for @ascentsparksoftware/react-calendar and its docs/demo site",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @ascentsparksoftware/react-calendar && npm run build -w demo",
+    "test": "npm run test -w @ascentsparksoftware/react-calendar",
+    "typecheck": "npm run typecheck -w @ascentsparksoftware/react-calendar",
+    "lint": "eslint .",
+    "e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@playwright/test": "^1.57.0",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.1.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.4"
+  },
+  "overrides": {
+    "esbuild": "^0.28.1"
+  }
+}

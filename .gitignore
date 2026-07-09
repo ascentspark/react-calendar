@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+apps/demo/dist/
+
+# Test artifacts
+coverage/
+playwright-report/
+test-results/
+e2e/__screenshots__/**/*-actual.png
+
+# Environment / editor
+.env
+.env.*
+.DS_Store
+*.log
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Internal working notes — never published
+CLAUDE.md
+.claude/
+internal_docs/
