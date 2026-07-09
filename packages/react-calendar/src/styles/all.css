@@ -1,0 +1,9 @@
+/* Source-level aggregate for dev/demo use. The published package ships the same
+   set concatenated to dist/styles.css (order per order.txt). */
+@import './month-view.css';
+@import './year-view.css';
+@import './time-grid-view.css';
+@import './timeline-view.css';
+@import './agenda-view.css';
+@import './event-dialog.css';
+@import './recurrence-editor.css';

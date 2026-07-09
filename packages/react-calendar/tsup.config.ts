@@ -39,7 +39,7 @@ export default defineConfig({
       .split('\n')
       .map((line) => line.trim())
       .filter(Boolean);
-    const seen = new Set(order);
+    const seen = new Set([...order, 'all.css']); // all.css is the dev-only @import aggregate
     for (const file of readdirSync(stylesDir).sort()) {
       if (file.endsWith('.css') && !seen.has(file)) {
         order.push(file);

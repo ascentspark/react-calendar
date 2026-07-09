@@ -146,6 +146,40 @@ export { CalCalendarA11y } from './a11y/cal-calendar-a11y';
 export { useFocusTrap } from './a11y/use-focus-trap';
 export { CalCalendarIntl } from './i18n/cal-calendar-intl';
 
+// ── Render-prop slot types ──────────────────────────────────────────────────
+export {
+  type RenderEvent,
+  type RenderCell,
+  type RenderOverflow,
+  type RenderResourceHeader,
+  type RenderEventDetail,
+} from './components/types';
+
+// ── Components ───────────────────────────────────────────────────────────────
+export { CalMonthView, type CalMonthViewProps } from './components/month-view/month-view';
+export { CalYearView, type CalYearViewProps } from './components/year-view/year-view';
+export {
+  CalTimeGridView,
+  type CalTimeGridViewProps,
+} from './components/time-grid-view/time-grid-view';
+export {
+  CalTimelineView,
+  type CalTimelineViewProps,
+} from './components/timeline-view/timeline-view';
+export { CalAgendaView, type CalAgendaViewProps } from './components/agenda-view/agenda-view';
+export {
+  CalEventDialog,
+  type CalEventDialogProps,
+} from './components/event-dialog/event-dialog';
+export {
+  CalRecurrenceEditor,
+  type CalRecurrenceEditorProps,
+} from './components/recurrence-editor/recurrence-editor';
+export {
+  CalTimezonePicker,
+  type CalTimezonePickerProps,
+} from './components/timezone-picker/timezone-picker';
+
 // ── Interactions ────────────────────────────────────────────────────────────
 export { type EventChange, type EventChangeKind } from './interactions/event-change';
 export {

@@ -1,0 +1,65 @@
+name: Release
+
+# Publishes the library to npm with provenance via OIDC trusted publishing (no npm token needed).
+# Run it from `main` after bumping the version in packages/react-calendar/package.json.
+# npm must have a Trusted Publisher configured for this package pointing at this repo + workflow
+# (npmjs.com -> package -> Settings -> Trusted Publisher -> GitHub Actions).
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write # create the git tag + GitHub Release after publishing
+  id-token: write # required for npm provenance / trusted publishing
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: npm
+
+      - name: Verify the release branch and read the version
+        id: meta
+        run: |
+          ref='${{ github.ref_name }}'
+          if [ "$ref" != "main" ]; then
+            echo "::error::Refusing to publish from branch '$ref'. Run Release from main."
+            exit 1
+          fi
+          version="$(node -p "require('./packages/react-calendar/package.json').version")"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Publishing $version from '$ref'."
+
+      # Trusted publishing (OIDC) needs a recent npm.
+      - run: npm install -g npm@latest
+      - run: npm ci
+      - run: npm run build -w @ascentsparksoftware/react-calendar
+      - run: node scripts/check-bundle-size.mjs
+      - run: TZ=UTC npm test
+      - run: TZ=America/New_York npm test
+
+      - run: npm publish --provenance --access public --tag latest
+        working-directory: packages/react-calendar
+
+      # Tag the published commit and cut a GitHub Release.
+      # Idempotent: skips if the tag/release already exists.
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version='${{ steps.meta.outputs.version }}'
+          if gh release view "v$version" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release v$version already exists — skipping."
+          else
+            gh release create "v$version" \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title "v$version" \
+              --notes "\`npm i @ascentsparksoftware/react-calendar\`. Published with provenance. See the [README](https://github.com/$GITHUB_REPOSITORY#readme)." \
+              --latest
+          fi

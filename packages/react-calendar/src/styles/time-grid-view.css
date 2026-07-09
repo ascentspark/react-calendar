@@ -1,0 +1,484 @@
+.cal-time-grid-view {
+  display: flex;
+  flex-direction: column;
+  container-type: inline-size;
+  background: var(--cal-bg);
+  color: var(--cal-ink);
+  font-family: inherit;
+  /* Fill a tall container and scroll when the day is taller than it. */
+  overflow: auto;
+
+  --cal-tg-hour: 3rem; /* min height of one hour row (grows to fill) */
+  --cal-tg-gutter-w: 3.5rem;
+  --cal-tg-allday-row: 1.4rem;
+
+  /* Horizontal orientation (week-as-rows) knobs. */
+  --cal-tg-hour-w: 5rem; /* width of one hour along the time axis */
+  --cal-tg-day-w: 4.75rem; /* width of the left day-label column */
+  --cal-tg-time-head: 1.75rem; /* height of the top time-axis strip */
+  --cal-tg-lane-h: 2.7rem; /* height of one event chip / sub-lane (fits a 2-line title) */
+  /* A day-row is tall enough for its busiest stack of overlapping events. */
+  --cal-tg-row-h: calc(var(--cal-tg-max-lanes, 1) * var(--cal-tg-lane-h) + 0.6rem);
+}
+
+.cal-tg {
+  display: grid;
+  grid-template-columns: var(--cal-tg-gutter-w) 1fr;
+  grid-template-rows: auto auto 1fr;
+  grid-template-areas:
+    'corner headers'
+    'allday-gutter allday'
+    'gutter cols';
+  border-block-start: 1px solid var(--cal-grid-line);
+  border-inline-start: 1px solid var(--cal-grid-line);
+  /* Grow to fill the host (a flex column); the gutter/cols carry their hour-based
+     min-height, so the hours stretch to fill and a long day overflows + scrolls. */
+  flex: 1 1 auto;
+}
+
+.cal-tg__corner {
+  grid-area: corner;
+  border-inline-end: 1px solid var(--cal-grid-line);
+  border-block-end: 1px solid var(--cal-grid-line);
+  background: var(--cal-surface-2);
+}
+
+.cal-tg__headers {
+  grid-area: headers;
+  display: grid;
+  grid-template-columns: repeat(var(--cal-tg-cols), 1fr);
+}
+
+.cal-tg__colhead {
+  padding: 0.35rem 0.25rem;
+  text-align: center;
+  border-inline-end: 1px solid var(--cal-grid-line);
+  border-block-end: 1px solid var(--cal-grid-line);
+  background: var(--cal-surface-2);
+}
+
+.cal-tg__colhead--weekend {
+  background: var(--cal-surface-sunk);
+}
+
+/* Weekend headers sit on the sunk surface; bump the weekday abbreviation to
+   ink-700 so it clears AA contrast there (muted is only AA against `surface`). */
+.cal-tg__colhead--weekend .cal-tg__colhead-wd {
+  color: var(--cal-ink-700);
+}
+
+.cal-tg__colhead-wd {
+  display: block;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--cal-ink-muted);
+}
+
+.cal-tg__colhead-day {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 1.7em;
+  block-size: 1.7em;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.cal-tg__colhead--today .cal-tg__colhead-day {
+  background: var(--cal-accent);
+  color: var(--cal-accent-ink);
+  border-radius: var(--cal-radius-pill);
+}
+
+.cal-tg__allday-gutter {
+  grid-area: allday-gutter;
+  font-size: 0.6rem;
+  color: var(--cal-ink-700);
+  text-align: end;
+  padding: 0.2rem 0.4rem;
+  border-inline-end: 1px solid var(--cal-grid-line);
+  border-block-end: 1px solid var(--cal-grid-line);
+  background: var(--cal-allday-bg);
+}
+
+.cal-tg__allday {
+  grid-area: allday;
+  min-block-size: calc(var(--cal-tg-allday-lanes, 0) * (var(--cal-tg-allday-row) + 2px) + 2px);
+  border-block-end: 1px solid var(--cal-grid-line);
+  background: var(--cal-allday-bg);
+}
+
+/* Inner gridcell wrapper: holds the all-day chips in their column grid while the
+   parent .cal-tg__allday carries the ARIA `row` role. */
+.cal-tg__allday-cells {
+  display: grid;
+  grid-auto-rows: var(--cal-tg-allday-row);
+  gap: 2px;
+  padding: 2px;
+  block-size: 100%;
+}
+
+.cal-tg__chip {
+  block-size: var(--cal-tg-allday-row);
+  display: flex;
+  align-items: center;
+  padding-inline: 0.4rem;
+  border: 0;
+  border-radius: var(--cal-radius-sm);
+  font: inherit;
+  font-size: 0.72rem;
+  cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: start;
+}
+
+.cal-tg__chip-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cal-tg__gutter {
+  grid-area: gutter;
+  position: relative;
+  min-block-size: calc(var(--cal-tg-hours) * var(--cal-tg-hour));
+  border-inline-end: 1px solid var(--cal-grid-line);
+}
+
+.cal-tg__tick {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: var(--tick-pos);
+  transform: translateY(-50%);
+  text-align: end;
+  padding-inline-end: 0.35rem;
+}
+
+.cal-tg__tick-label {
+  font-size: 0.62rem;
+  color: var(--cal-ink-700);
+  font-variant-numeric: tabular-nums;
+}
+
+.cal-tg__cols {
+  grid-area: cols;
+  display: grid;
+  grid-template-columns: repeat(var(--cal-tg-cols), 1fr);
+  min-block-size: calc(var(--cal-tg-hours) * var(--cal-tg-hour));
+}
+
+.cal-tg__col {
+  position: relative;
+  border-inline-end: 1px solid var(--cal-grid-line);
+  background: var(--cal-surface);
+  cursor: pointer;
+}
+
+.cal-tg__col--weekend {
+  background: var(--cal-surface-2);
+}
+
+.cal-tg__line {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: var(--tick-pos);
+  border-block-start: 1px solid var(--cal-grid-line);
+  opacity: 0.6;
+}
+/* Sub-hour (slotMinutes) gridlines: fainter than the labelled hour lines. */
+.cal-tg__line--minor {
+  opacity: 0.28;
+}
+
+.cal-tg__event {
+  position: absolute;
+  inset-block-start: var(--ev-start);
+  block-size: var(--ev-size);
+  inset-inline-start: calc(var(--ev-cross-start) + 1px);
+  inline-size: calc(var(--ev-cross-size) - 2px);
+  min-block-size: 0.9rem;
+  display: flex;
+  align-items: flex-start;
+  padding: 0.15rem 0.35rem;
+  border: 0;
+  border-radius: var(--cal-radius-sm);
+  font: inherit;
+  font-size: 0.7rem;
+  line-height: 1.15;
+  text-align: start;
+  cursor: grab;
+  touch-action: none;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px var(--cal-bg);
+}
+
+.cal-tg__event:focus-visible,
+.cal-tg__chip:focus-visible,
+.cal-tg__col:focus-visible {
+  outline: 2px solid var(--cal-ring);
+  outline-offset: -1px;
+  z-index: 3;
+}
+
+.cal-tg__event-title {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.cal-tg__event--dragging {
+  z-index: 5;
+  opacity: 0.9;
+  cursor: grabbing;
+  box-shadow: 0 2px 8px var(--cal-scrim);
+}
+
+.cal-tg__resize {
+  position: absolute;
+  inset-inline: 0;
+  block-size: 7px;
+  cursor: ns-resize;
+  touch-action: none;
+}
+
+.cal-tg__resize--start {
+  inset-block-start: -1px;
+}
+
+.cal-tg__resize--end {
+  inset-block-end: -1px;
+}
+
+.cal-tg__create-ghost {
+  position: absolute;
+  inset-inline: 1px;
+  inset-block-start: var(--ev-start);
+  block-size: var(--ev-size);
+  background: var(--cal-accent-soft);
+  border: 1px dashed var(--cal-accent);
+  border-radius: var(--cal-radius-sm);
+  opacity: 0.85;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.cal-tg__now {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: var(--now-pos);
+  border-block-start: 2px solid var(--cal-now-line);
+  z-index: 4;
+  pointer-events: none;
+}
+
+.cal-tg__now-dot {
+  position: absolute;
+  inset-inline-start: -3px;
+  inset-block-start: -4px;
+  inline-size: 7px;
+  block-size: 7px;
+  border-radius: var(--cal-radius-pill);
+  background: var(--cal-now-line);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
+
+/* Visually-hidden live region (announced to screen readers only). */
+.cal-tg__sr {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.cal-tg__inline {
+  inline-size: 100%;
+  font: inherit;
+  font-size: 0.7rem;
+  border: 0;
+  border-radius: var(--cal-radius-sm);
+  padding: 0.1rem 0.25rem;
+  background: var(--cal-bg);
+  color: var(--cal-ink);
+  outline: 2px solid var(--cal-ring);
+}
+
+/* Print: faithful colours, no interactive chrome, avoid clipping events. */
+@media print {
+  .cal-tg__resize,
+  .cal-tg__now {
+    display: none;
+  }
+  .cal-tg__event {
+    box-shadow: none;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* Compact density: tighter hour rows + type for dense day/week schedules. */
+.cal-time-grid-view.cal-tg--compact {
+  --cal-tg-hour: 2rem;
+  --cal-tg-allday-row: 1.15rem;
+}
+.cal-time-grid-view.cal-tg--compact .cal-tg__event {
+  font-size: 0.65rem;
+  padding: 0.08rem 0.3rem;
+}
+.cal-time-grid-view.cal-tg--compact .cal-tg__tick-label,
+.cal-time-grid-view.cal-tg--compact .cal-tg__colhead-wd {
+  font-size: 0.6rem;
+}
+.cal-time-grid-view.cal-tg--compact .cal-tg__colhead-day {
+  min-inline-size: 1.4em;
+  block-size: 1.4em;
+  font-size: 0.72rem;
+}
+
+/* ── Horizontal orientation (time flows left→right; days stack as rows) ────────
+   Transpose of the vertical layout. The component emits axis-neutral --ev-*,
+   --tick-pos and --now-pos fractions, so only their axis mapping changes here. */
+.cal-time-grid-view.cal-tg--horizontal .cal-tg {
+  /* Fill the host: day-rows stretch (minmax row-h → 1fr) to divide the height evenly,
+     while events stay fixed-height centered chips (never tall slivers). Scroll
+     horizontally for the full day. */
+  flex: 1 1 auto;
+  grid-template-columns: var(--cal-tg-day-w) 1fr;
+  grid-template-rows: var(--cal-tg-time-head) 1fr;
+  grid-template-areas:
+    'corner gutter'
+    'headers cols';
+}
+/* All-day band is omitted in week-as-rows. */
+.cal-time-grid-view.cal-tg--horizontal .cal-tg__allday-gutter,
+.cal-time-grid-view.cal-tg--horizontal .cal-tg__allday {
+  display: none;
+}
+/* Day headers: a vertical stack on the left, one label per day-row. */
+.cal-time-grid-view.cal-tg--horizontal .cal-tg__headers {
+  grid-template-columns: none;
+  grid-auto-rows: minmax(var(--cal-tg-row-h), 1fr);
+}
+.cal-time-grid-view.cal-tg--horizontal .cal-tg__colhead {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  padding: 0.2rem;
+  border-inline-end: 1px solid var(--cal-grid-line);
+  border-block-end: 1px solid var(--cal-grid-line);
+}
+/* Time strip on top; ticks positioned by inline offset, left-aligned so the first
+   label never clips at the edge. */
+.cal-time-grid-view.cal-tg--horizontal .cal-tg__gutter {
+  min-block-size: 0;
+  min-inline-size: calc(var(--cal-tg-hours) * var(--cal-tg-hour-w));
+  border-inline-end: 0;
+  border-block-end: 1px solid var(--cal-grid-line);
+}
+.cal-time-grid-view.cal-tg--horizontal .cal-tg__tick {
+  inset-block: 0;
+  inset-inline: auto;
+  inset-inline-start: var(--tick-pos);
+  text-align: start;
+  padding: 0;
+  transform: none;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+.cal-time-grid-view.cal-tg--horizontal .cal-tg__tick-label {
+  padding-inline: 0.15rem 0.3rem;
+}
+/* Day rows: stacked vertically at a fixed height; each spans the full time width. */
+.cal-time-grid-view.cal-tg--horizontal .cal-tg__cols {
+  grid-template-columns: none;
+  grid-auto-rows: minmax(var(--cal-tg-row-h), 1fr);
+  min-block-size: 0;
+  min-inline-size: calc(var(--cal-tg-hours) * var(--cal-tg-hour-w));
+}
+.cal-time-grid-view.cal-tg--horizontal .cal-tg__col {
+  border-inline-end: 0;
+  border-block-end: 1px solid var(--cal-grid-line);
+}
+/* Hour lines run vertically, positioned by inline offset. */
+.cal-time-grid-view.cal-tg--horizontal .cal-tg__line {
+  inset-block: 0;
+  inset-inline-start: var(--tick-pos);
+  border-block-start: 0;
+  border-inline-start: 1px solid var(--cal-grid-line);
+}
+/* Events: time on the inline axis; fixed-height chips stacked by lane and centered
+   in the row (short horizontal bars, not full-height slivers). */
+.cal-time-grid-view.cal-tg--horizontal .cal-tg__event {
+  inset-inline-start: var(--ev-start);
+  inline-size: var(--ev-size);
+  block-size: calc(var(--cal-tg-lane-h) - 0.4rem);
+  inset-block-start: calc(
+    (100% - var(--cal-tg-max-lanes, 1) * var(--cal-tg-lane-h)) / 2 + var(--ev-lane, 0) *
+      var(--cal-tg-lane-h) + 0.2rem
+  );
+  min-block-size: 0;
+  /* Wide enough to hold a whole word on a line; a short event overflows its slot
+     slightly rather than shredding the title (e.g. "Morning" must not break to
+     "Morni"/"ng"). */
+  min-inline-size: 4.75rem;
+  align-items: center;
+  padding: 0.1rem 0.4rem;
+}
+/* Wrap the title to two lines so a short event ("Design review", "Morning standup")
+   reads as whole words stacked. Break only between words, never mid-word. */
+.cal-time-grid-view.cal-tg--horizontal .cal-tg__event-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: normal;
+  line-height: 1.1;
+}
+/* Now-indicator runs vertically. */
+.cal-time-grid-view.cal-tg--horizontal .cal-tg__now {
+  inset-block: 0;
+  inset-inline-start: var(--now-pos);
+  border-block-start: 0;
+  border-inline-start: 2px solid var(--cal-now-line);
+}
+.cal-time-grid-view.cal-tg--horizontal .cal-tg__now-dot {
+  inset-block-start: -3px;
+  inset-inline-start: -3px;
+}
+/* Resize handles move to the left/right edges. */
+.cal-time-grid-view.cal-tg--horizontal .cal-tg__resize {
+  inset-block: 0;
+  block-size: auto;
+  inline-size: 7px;
+  cursor: ew-resize;
+}
+.cal-time-grid-view.cal-tg--horizontal .cal-tg__resize--start {
+  inset-inline-start: -1px;
+  inset-block-start: 0;
+}
+.cal-time-grid-view.cal-tg--horizontal .cal-tg__resize--end {
+  inset-inline-end: -1px;
+  inset-block-start: 0;
+}
+/* Create-ghost spans the lane height at the dragged time range. */
+.cal-time-grid-view.cal-tg--horizontal .cal-tg__create-ghost {
+  inset-block: 1px;
+  inset-inline-start: var(--ev-start);
+  inline-size: var(--ev-size);
+  block-size: auto;
+}

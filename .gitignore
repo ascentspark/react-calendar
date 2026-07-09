@@ -21,6 +21,4 @@ e2e/__screenshots__/**/*-actual.png
 !.vscode/extensions.json
 
 # Internal working notes — never published
-CLAUDE.md
-.claude/
 internal_docs/

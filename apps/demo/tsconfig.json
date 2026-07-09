@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["vite/client"],
+    "paths": {
+      "@ascentsparksoftware/react-calendar": ["../../packages/react-calendar/src/index.ts"],
+      "@ascentsparksoftware/react-calendar/date-fns": [
+        "../../packages/react-calendar/src/date-fns/index.ts"
+      ],
+      "@ascentsparksoftware/react-calendar/recurrence": [
+        "../../packages/react-calendar/src/recurrence/index.ts"
+      ],
+      "@ascentsparksoftware/react-calendar/export": [
+        "../../packages/react-calendar/src/export/index.ts"
+      ]
+    }
+  },
+  "include": ["src"]
+}

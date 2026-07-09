@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    name: React 19
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build -w @ascentsparksoftware/react-calendar
+      - run: node scripts/check-bundle-size.mjs
+      # Date/adapter specs must hold in UTC and across a DST-observing zone.
+      - run: TZ=UTC npm test
+      - run: TZ=America/New_York npm test
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run build -w demo
