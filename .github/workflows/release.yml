@@ -43,8 +43,15 @@ jobs:
       - run: TZ=UTC npm test
       - run: TZ=America/New_York npm test
 
+      # Bootstrap: the very first publish of a new package cannot use a Trusted
+      # Publisher (npm only lets you configure one on an existing package), so it
+      # authenticates with the NPM_TOKEN secret. Once the Trusted Publisher is
+      # configured on npmjs.com, delete the env block below and the repo secret —
+      # publishing then runs tokenless over OIDC.
       - run: npm publish --provenance --access public --tag latest
         working-directory: packages/react-calendar
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       # Tag the published commit and cut a GitHub Release.
       # Idempotent: skips if the tag/release already exists.
