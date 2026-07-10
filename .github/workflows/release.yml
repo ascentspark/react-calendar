@@ -19,7 +19,9 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: 22
+          # Node 24 bundles npm 11 (>= 11.5), new enough for provenance and OIDC
+          # trusted publishing without upgrading npm over the toolcache install.
+          node-version: 24
           registry-url: https://registry.npmjs.org
           cache: npm
 
@@ -35,8 +37,7 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "Publishing $version from '$ref'."
 
-      # Trusted publishing (OIDC) needs a recent npm.
-      - run: npm install -g npm@latest
+      - run: npm --version
       - run: npm ci
       - run: npm run build -w @ascentsparksoftware/react-calendar
       - run: node scripts/check-bundle-size.mjs
