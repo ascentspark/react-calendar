@@ -229,7 +229,7 @@ export function deriveTheme(
         fill = parseHex(hex);
       } catch {
         // A single bad event colour must never break the whole theme.
-        console.warn(`[angular-calendar] invalid event colour for "${rawKey}": ${hex}`);
+        console.warn(`[react-calendar] invalid event colour for "${rawKey}": ${hex}`);
         continue;
       }
       // Deepen the colour so white ink is legible on it, then use white everywhere

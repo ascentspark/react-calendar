@@ -6,6 +6,13 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.0.1] — 2026-07-10
+
+### Fixed
+
+- ICS export `PRODID` and the invalid-colour console warning identified the package as
+  `angular-calendar`; both now say `react-calendar`.
+
 ## [1.0.0] — 2026-07-10
 
 First stable release: full feature parity with `@ascentsparksoftware/angular-calendar@22.1.0`,
@@ -39,5 +46,6 @@ overlap packing, OKLCH theming pipeline).
 - **SSR/Next.js:** `"use client"` entries, no module-scope DOM access, StrictMode-idempotent
   effects, React-Compiler-safe API.
 
-[Unreleased]: https://github.com/ascentspark/react-calendar/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/ascentspark/react-calendar/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/ascentspark/react-calendar/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/ascentspark/react-calendar/releases/tag/v1.0.0

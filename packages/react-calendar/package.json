@@ -1,6 +1,6 @@
 {
   "name": "@ascentsparksoftware/react-calendar",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Modern, theme-agnostic calendar & scheduler for React — month/week/day, resource timeline, agenda and year views, timezone-correct, with RRULE recurrence, OKLCH theming and a touch-first interaction layer. SSR/Next.js-safe.",
   "keywords": [
     "react",

@@ -70,7 +70,7 @@ export function eventsToIcs(
   events: readonly CalendarEvent[],
   options: IcsExportOptions,
 ): string {
-  const prodId = options.prodId ?? '-//Ascentspark//angular-calendar//EN';
+  const prodId = options.prodId ?? '-//Ascentspark//react-calendar//EN';
   const lines: string[] = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
