@@ -81,7 +81,7 @@
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "fast-check": "^4.9.0",
-    "jsdom": "^26.1.0",
+    "jsdom": "^29.1.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "tsup": "^8.5.0",
